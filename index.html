@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ГОС-ОТКАТ">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0d1220">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>ГОС-ОТКАТ 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Rubik:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d1220; --panel:#151d2e; --line:#2c3b55;
+  --paper:#f4e8cf; --ink:#2b2115; --ink-soft:#6b5c42;
+  --red:#c8102e; --green:#1d7a46; --blue:#2456a6; --gold:#e8b53e; --cream:#fff6dd;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+[hidden]{display:none !important}
+html,body{position:fixed;inset:0;width:100%;height:100%;overflow:hidden;overscroll-behavior:none}
+body{font-family:'Rubik',sans-serif;color:var(--cream);
+  -webkit-text-size-adjust:100%;-webkit-user-select:none;user-select:none;
+  -webkit-touch-callout:none;touch-action:manipulation;background:
+  radial-gradient(900px 500px at 80% -10%, rgba(26,42,74,.35), transparent 60%),
+  radial-gradient(800px 500px at -10% 110%, rgba(74,26,42,.30), transparent 60%),
+  repeating-linear-gradient(-45deg, transparent 0 34px, rgba(255,255,255,.014) 34px 36px),
+  var(--bg)}
+button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;cursor:pointer}
+input,textarea{-webkit-user-select:text;user-select:text}
+
+.strobe{position:fixed;top:0;bottom:0;width:44px;z-index:44;pointer-events:none;opacity:0;transition:opacity .6s}
+.strobe.l{left:0;background:linear-gradient(90deg,rgba(200,16,46,.4),transparent)}
+.strobe.r{right:0;background:linear-gradient(-90deg,rgba(36,86,166,.4),transparent)}
+body.hot .strobe{opacity:1;animation:strobeFlash 1.1s infinite}
+body.hot .strobe.r{animation-delay:.55s}
+body.veryhot .strobe.l{background:linear-gradient(90deg,rgba(255,40,60,.6),transparent)}
+body.veryhot .strobe.r{background:linear-gradient(-90deg,rgba(60,120,255,.6),transparent)}
+@keyframes strobeFlash{0%,100%{opacity:.15}50%{opacity:1}}
+@keyframes blink{50%{opacity:.25}}
+@keyframes quake{0%,100%{transform:translate(0)}20%{transform:translate(-7px,3px)}40%{transform:translate(6px,-4px)}60%{transform:translate(-5px,2px)}80%{transform:translate(4px,-2px)}}
+body.quake{animation:quake .45s}
+
+.app{height:100vh;height:100dvh;display:flex;flex-direction:column;gap:8px;
+  max-width:620px;margin:0 auto;width:100%;
+  padding:calc(8px + env(safe-area-inset-top)) 12px calc(8px + env(safe-area-inset-bottom))}
+
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:none}
+.ttl h1{font-family:'Unbounded';font-weight:900;font-size:clamp(17px,5vw,30px);line-height:1;letter-spacing:.02em}
+.ttl h1 em{font-style:normal;display:inline-block;background:var(--red);color:#fff;padding:1px 8px;border-radius:6px;
+  transform:rotate(-3deg);font-size:.62em;vertical-align:middle;box-shadow:0 5px 14px rgba(200,16,46,.4)}
+.gov-sub{font-size:10px;color:#8fa1c0;font-style:italic;margin-top:3px;display:none}
+@media(min-width:640px){.gov-sub{display:block}}
+.topbtns{display:flex;gap:6px}
+.tbtn{position:relative;width:40px;height:40px;font-size:17px;background:var(--panel);border:2px solid var(--line);
+  border-radius:10px;color:var(--gold-2);transition:.15s;display:grid;place-items:center}
+.tbtn:active{transform:scale(.92)}
+.tbtn.off{opacity:.35}
+#newsBtn.fresh::after{content:'';position:absolute;top:5px;right:5px;width:9px;height:9px;border-radius:50%;
+  background:#ff5a4a;box-shadow:0 0 8px #ff5a4a;animation:blink 1.2s infinite}
+
+/* HUD — 3 плитки */
+.hud{flex:none;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.hud-item{background:var(--panel);border:2px solid var(--line);border-radius:10px;padding:8px 10px;min-width:0}
+.hud-item label{display:block;font-size:9px;letter-spacing:.1em;color:#8fa1c0;text-transform:uppercase;margin-bottom:5px;line-height:1.3}
+.hud-item b{display:block;font-family:'Unbounded';font-size:clamp(12px,3.6vw,18px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hud-item i.hud-sub{display:block;font-style:italic;font-size:10.5px;color:#e3c078;margin-top:4px;line-height:1.35;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:28px}
+#hudSpent{color:#7dffb0} #hudKick{color:var(--gold)} #hudRisk{color:#ff8fa0}
+.bar{height:5px;background:#0a0f18;border-radius:4px;overflow:hidden;margin-top:6px;border:1px solid var(--line)}
+.bar span{display:block;height:100%;width:0%;transition:width .4s;background:linear-gradient(90deg,#39d98a,#e8b53e)}
+.bar.red span{background:linear-gradient(90deg,#e8b53e,#ff5a4a)}
+.heart{display:inline-block;font-size:11px;transition:transform .1s;vertical-align:middle}
+.heart.beat{transform:scale(1.5)}
+.heart.calm{opacity:.3}
+.pulse-line{font-size:9.5px;color:#5f7091;margin-top:4px}
+.pulse-line b{color:#ff8fa0}
+
+.stage{flex:1;display:flex;flex-direction:column;min-height:0;gap:8px}
+.stack{position:relative;flex:none;width:100%;height:clamp(180px,25dvh,310px)}
+.card{position:absolute;inset:0;border-radius:8px;padding:12px 16px;overflow:hidden;color:var(--ink);
+  display:flex;flex-direction:column;
+  background:
+   repeating-linear-gradient(0deg, transparent 0 27px, rgba(43,33,21,.05) 27px 28px),
+   var(--paper);
+  box-shadow:0 14px 30px rgba(0,0,0,.5);
+  transition:transform .42s cubic-bezier(.4,0,.2,1), opacity .42s}
+.card.top{z-index:3}
+.card.back{z-index:1;transform:translateY(calc(var(--i)*10px)) scale(calc(1 - var(--i)*.045));opacity:.8}
+.card::after{content:'₽';position:absolute;right:-10px;bottom:-34px;font-size:130px;font-weight:700;opacity:.06;pointer-events:none}
+.card.fly-l{transform:translateX(-135%) rotate(-13deg)!important;opacity:0}
+.card.fly-r{transform:translateX(135%) rotate(13deg)!important;opacity:0}
+@keyframes tremble{0%,100%{transform:translate(0,0) rotate(0)}25%{transform:translate(1.6px,-1px) rotate(.35deg)}
+ 50%{transform:translate(-1.2px,1.5px) rotate(-.35deg)}75%{transform:translate(1px,1px) rotate(.25deg)}}
+#stack.tremble .card.top{animation:tremble .16s infinite}
+.c-head{display:flex;justify-content:space-between;gap:8px;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-soft);border-bottom:2px solid rgba(43,33,21,.15);padding-bottom:6px;flex:none}
+.c-head b{color:#8a2d1c}
+.card h3{font-family:'Unbounded';font-weight:700;font-size:clamp(13.5px,3.7vw,17px);line-height:1.25;margin:7px 0 5px;color:#221a10;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;flex:none}
+.c-sum{font-family:'Unbounded';font-weight:900;font-size:clamp(17px,5vw,24px);color:#a01128;margin-bottom:6px;flex:none}
+.c-desc{font-size:clamp(11.5px,3vw,13px);line-height:1.42;color:#4a3d2a;flex:1;min-height:0;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.c-note{font-size:clamp(10.5px,2.8vw,12px);font-style:italic;color:#8a6d2f;border-top:1px dashed rgba(43,33,21,.3);
+  padding-top:6px;margin-top:6px;flex:none;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.stamp{position:absolute;top:40%;left:50%;transform:translate(-50%,-50%) rotate(-14deg) scale(1.7);
+  font-family:'Unbounded';font-weight:900;font-size:clamp(22px,6vw,32px);letter-spacing:.1em;padding:6px 18px;border-radius:8px;
+  border:5px double;background:rgba(255,255,255,.72);opacity:0;transition:.25s;pointer-events:none;z-index:4}
+.stamp.ok{color:var(--green);border-color:var(--green)}
+.stamp.no{color:var(--red);border-color:var(--red)}
+.stamp.show{opacity:.92;transform:translate(-50%,-50%) rotate(-14deg) scale(1)}
+
+.actions{flex:none;display:flex;gap:10px}
+.act{flex:1;min-width:0;font-family:'Unbounded';font-weight:700;font-size:clamp(12px,3.3vw,15px);letter-spacing:.03em;
+  padding:13px 4px;border-radius:11px;transition:.12s;border:3px solid;background:transparent;line-height:1.35}
+.act.reject{border-color:#a03246;color:#ff8fa0}
+.act.reject:active{background:rgba(160,50,70,.2)}
+.act.sign{background:var(--blue);border-color:#3d6fc0;color:#dce9ff}
+.act.sign:active{background:#1d4a8f}
+.act.bribe{flex:.92;border-color:#a9741b;color:#ffdf8e;background:rgba(232,181,62,.08);font-size:clamp(10px,2.7vw,12.5px)}
+.act.bribe:active{background:rgba(232,181,62,.25)}
+
+.turnbar{flex:none;text-align:center;font-size:11.5px;color:#8fa1c0;background:var(--panel);
+  border:2px solid var(--line);border-radius:9px;padding:6px 10px}
+.turnbar b{color:var(--gold);font-family:'Unbounded';font-size:12.5px}
+
+.verdict{flex:1;min-height:60px;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--panel);
+  border:2px solid var(--line);border-radius:11px;padding:10px 13px;font-size:clamp(12px,3.2vw,14px);line-height:1.5;transition:.3s}
+.verdict.bribe-ok{border-color:#2fa866;box-shadow:0 0 22px rgba(47,168,102,.25)}
+.v-hd{display:block;font-family:'Unbounded';font-weight:700;color:#7dffb0;margin-bottom:5px;font-size:13px}
+.v-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.chipd{font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;background:#0a0f18;border:1px solid var(--line);color:#9aa8c2}
+.chipd.good{color:#7dffb0;border-color:#2a6b45}
+.chipd.bad{color:#ff8fa0;border-color:#7a3a32}
+.chipd.gold{color:var(--gold);border-color:#6e5320}
+
+/* ══ ПАНЕЛИ (новости / правила) ══ */
+.sheet-wrap{position:fixed;inset:0;z-index:95}
+.np-back{position:absolute;inset:0;background:rgba(5,8,16,.75);animation:fadeIn .25s both}
+@keyframes fadeIn{from{opacity:0}}
+.np-sheet{position:absolute;left:0;right:0;bottom:0;height:min(82dvh,720px);background:var(--panel);
+  border-top:3px solid var(--gold);border-radius:20px 20px 0 0;display:flex;flex-direction:column;
+  animation:sheetUp .3s cubic-bezier(.2,.8,.25,1) both;padding-bottom:env(safe-area-inset-bottom)}
+@keyframes sheetUp{from{transform:translateY(100%)}}
+.np-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:2px solid var(--line);
+  font-family:'Unbounded';font-size:14px;color:var(--gold);flex:none}
+.np-head .live{font-size:9px;color:#ff8fa0;letter-spacing:.24em;animation:blink 1.6s infinite}
+.np-close{margin-left:auto;width:36px;height:36px;border-radius:9px;background:#0a0f18;border:2px solid var(--line);
+  color:var(--cream);font-size:16px}
+#newsFeed{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px;display:flex;flex-direction:column;gap:8px}
+.n-item{background:#0e1524;border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:8px;
+  padding:8px 10px;font-size:12.5px;line-height:1.5;animation:nIn .45s ease both}
+@keyframes nIn{from{opacity:0;transform:translateY(-14px)}}
+.n-top{display:flex;gap:8px;align-items:baseline;margin-bottom:3px}
+.n-tag{font-size:10px;letter-spacing:.14em;color:#ffdf8e;font-weight:700}
+.n-tag.red{color:#ff8fa0}.n-tag.green{color:#7dffb0}.n-tag.blue{color:#8fb4ff}
+.n-src{font-size:10px;color:#5f7091}
+.n-time{font-size:10px;color:#5f7091;margin-left:auto}
+.n-txt{color:#cdd6e6}
+
+/* правила */
+.rules{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:18px 16px 26px;font-size:13px;line-height:1.62;color:#cdd6e6}
+.r-stamp{display:inline-block;font-family:'Unbounded';font-weight:700;font-size:11px;color:#ff8fa0;
+  border:2px solid #a03246;border-radius:7px;padding:5px 12px;transform:rotate(-2deg);margin-bottom:14px;letter-spacing:.08em}
+.rules h4{font-family:'Unbounded';font-size:14px;color:var(--gold-2);margin-bottom:14px;line-height:1.45}
+.r-item{margin-bottom:11px;padding-left:26px;position:relative}
+.r-item b{position:absolute;left:0;top:0;font-family:'Unbounded';color:var(--gold);font-size:12px}
+.r-sign{margin-top:20px;font-style:italic;color:#8fa1c0;border-top:1px dashed var(--line);padding-top:12px;font-size:12px}
+
+/* ══ ЗВОНОК ══ */
+#callUI{position:fixed;top:calc(14px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:90;
+  background:rgba(14,21,36,.97);border:2px solid var(--gold);border-radius:16px;padding:16px 18px;
+  display:flex;gap:14px;align-items:center;max-width:calc(100vw - 24px);flex-wrap:wrap;justify-content:center;
+  box-shadow:0 20px 60px rgba(0,0,0,.7);animation:callShake .5s infinite}
+@keyframes callShake{0%,100%{transform:translateX(-50%) rotate(0)}25%{transform:translateX(-50%) rotate(-1.2deg) translateY(-2px)}
+ 75%{transform:translateX(-50%) rotate(1.2deg)}}
+.call-icon{font-size:34px;animation:blink 1s infinite}
+.call-txt b{font-family:'Unbounded';font-size:14px;color:var(--gold-2);display:block;margin-bottom:2px}
+.call-txt span{font-size:12.5px;color:#cdd6e6;display:block}
+.call-txt i{font-size:10.5px;color:#8fa1c0;font-style:italic}
+.call-btns{display:flex;flex-direction:column;gap:7px}
+.call-btns button{font-family:'Rubik';font-weight:700;border-radius:9px;padding:9px 16px;border:2px solid;font-size:12.5px}
+#callAns{background:#1d7a46;border-color:#2fa866;color:#eafff2}
+#callDecl{background:transparent;border-color:#a03246;color:#ff8fa0}
+#callTimer{position:absolute;bottom:-20px;left:0;right:0;text-align:center;font-size:10.5px;color:#8fa1c0}
+
+/* ══ ПОЛИЦЕЙСКИЙ ══ */
+#copZone{position:fixed;left:0;bottom:env(safe-area-inset-bottom);width:150px;height:180px;pointer-events:none;z-index:45;--copX:-130%}
+#cop{position:absolute;bottom:-4px;left:0;font-size:80px;line-height:1;z-index:1;
+  transform:translateX(var(--copX)) rotate(6deg);transition:transform .7s cubic-bezier(.3,.8,.3,1);
+  filter:drop-shadow(0 10px 14px rgba(0,0,0,.55))}
+#copZone.knock #cop{animation:copKnock .55s}
+@keyframes copKnock{0%,100%{transform:translateX(var(--copX)) rotate(6deg)}
+ 25%{transform:translateX(calc(var(--copX) + 7%)) rotate(-2deg)}
+ 55%{transform:translateX(var(--copX)) rotate(9deg)}
+ 80%{transform:translateX(calc(var(--copX) + 5%)) rotate(3deg)}}
+#copWall{position:absolute;bottom:0;left:0;width:34px;height:100%;z-index:2;
+  background:linear-gradient(90deg,#26344f,#101623 70%,#0a0e18);border-right:3px solid #3d5273;
+  box-shadow:10px 0 22px rgba(0,0,0,.5)}
+#copBubble{position:absolute;left:52px;bottom:146px;background:#fff;color:#111;font-weight:700;font-size:11px;
+  padding:5px 9px;border-radius:9px;opacity:0;transition:.4s;transform:translateX(-12px);z-index:3;white-space:nowrap}
+#copBubble.show{opacity:1;transform:translateX(0)}
+#copBubble::after{content:'';position:absolute;left:-6px;bottom:7px;border:5px solid transparent;border-right-color:#fff}
+
+/* ══ ОМОН ══ */
+#raid{position:fixed;inset:0;z-index:120;display:grid;place-items:center;background:rgba(10,5,8,.92);
+  animation:raidBg .3s infinite}
+@keyframes raidBg{0%,100%{box-shadow:inset 0 0 220px rgba(200,16,46,.85)}50%{box-shadow:inset 0 0 220px rgba(36,86,166,.85)}}
+.raid-txt{font-family:'Unbounded';font-weight:900;font-size:clamp(30px,8vw,72px);color:#fff;text-align:center;
+  line-height:1.15;text-shadow:0 0 34px #ff3b3b, 0 5px 0 #7d0a1e;animation:raidTxt .12s infinite;padding:20px}
+.raid-txt small{display:block;font-size:.3em;color:#ffd9a0;margin-top:14px;font-weight:400;font-family:'Rubik';letter-spacing:.08em}
+@keyframes raidTxt{0%,100%{transform:scale(1) rotate(-.6deg)}50%{transform:scale(1.05) rotate(.6deg)}}
+
+/* ══ ФИНАЛ ══ */
+.overlay{position:fixed;inset:0;background:rgba(5,8,16,.92);display:none;place-items:center;z-index:110;
+  padding:16px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.overlay.show{display:grid}
+.o-card{background:var(--panel);border:3px solid var(--gold);border-radius:18px;padding:24px 22px;max-width:480px;width:100%;
+  text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.7);animation:oIn .4s ease;margin:auto}
+@keyframes oIn{from{transform:scale(.85);opacity:0}}
+.o-emoji{font-size:50px}
+.o-card h2{font-family:'Unbounded';font-size:clamp(19px,5vw,24px);margin:8px 0;color:var(--gold)}
+.o-card.prison{border-color:#a03246}
+.o-card.prison h2{color:#ff8fa0}
+.o-card p{font-size:13.5px;line-height:1.6;color:#cdd6e6;margin-bottom:16px}
+.o-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px}
+.o-stats div{background:#0a0f18;border:1px solid var(--line);border-radius:10px;padding:9px}
+.o-stats label{display:block;font-size:9px;letter-spacing:.16em;color:#8fa1c0;text-transform:uppercase;margin-bottom:3px}
+.o-stats b{font-family:'Unbounded';font-size:13px;color:var(--cream)}
+.o-btn{font-family:'Unbounded';font-weight:700;font-size:13px;padding:12px 22px;border-radius:10px;
+  border:2px solid #8a6d2f;background:linear-gradient(180deg,#ffdf8e,#e0a72e);color:#3a2405}
+
+.win-scene{position:relative;height:110px;overflow:hidden;margin:4px 0 14px;border-radius:12px;
+  background:linear-gradient(180deg,#0d2a55,#154a8a)}
+.wave{position:absolute;bottom:-6px;left:-20%;width:140%;height:26px;border-radius:50% 50% 0 0;
+  background:linear-gradient(180deg,#3d6fc0,#2456a6);animation:waveMove 3s ease-in-out infinite}
+@keyframes waveMove{0%,100%{transform:translateX(-2%)}50%{transform:translateX(2%)}}
+.yacht{position:absolute;left:8%;bottom:14px;font-size:52px;animation:sail 3.2s ease-in-out infinite;z-index:2}
+@keyframes sail{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-8px) rotate(3deg)}}
+.bars{position:absolute;right:7%;bottom:12px;display:flex;flex-direction:column;gap:4px;align-items:center;z-index:2}
+.bars .row{display:flex;gap:4px}
+.bars i{width:36px;height:16px;border-radius:4px;background:linear-gradient(180deg,#fff3c4,#e8b53e 55%,#9c6f1a);
+  box-shadow:inset 0 0 6px rgba(0,0,0,.4);transform:skewX(-10deg)}
+.rain{position:absolute;inset:0;pointer-events:none;z-index:1}
+.rain i{position:absolute;top:-24px;font-size:15px;font-style:normal;animation:coinFall linear infinite}
+@keyframes coinFall{to{transform:translateY(150px) rotate(340deg);opacity:.15}}
+
+/* ══ ПАРОЛЬ ══ */
+#lock{position:fixed;inset:0;z-index:200;display:grid;place-items:center;
+  background:radial-gradient(900px 500px at 50% -10%, rgba(26,42,74,.5), transparent 60%), var(--bg)}
+.lock-card{background:var(--panel);border:3px solid var(--gold);border-radius:18px;padding:34px 28px;
+  max-width:380px;width:calc(100% - 40px);text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.7)}
+.lock-card .l-emoji{font-size:52px}
+.lock-card h2{font-family:'Unbounded';font-size:20px;color:var(--gold-2);margin:14px 0 8px}
+.lock-card p{font-size:13px;color:#8fa1c0;line-height:1.55;margin-bottom:20px}
+#lockPass{width:100%;background:#0a0f18;border:2px solid var(--line);border-radius:10px;
+  padding:13px 15px;color:var(--cream);font-family:'Rubik';font-size:16px;text-align:center;
+  letter-spacing:.15em;outline:none}
+#lockPass:focus{border-color:var(--gold)}
+#lockBtn{margin-top:14px;width:100%;font-family:'Unbounded';font-weight:700;font-size:14px;padding:14px;
+  border-radius:10px;border:2px solid #8a6d2f;background:linear-gradient(180deg,#ffdf8e,#e0a72e);color:#3a2405}
+#lockErr{min-height:20px;font-size:12.5px;color:#ff8fa0;margin-top:10px;font-style:italic}
+.lock-card.shake{animation:lockShake .4s}
+@keyframes lockShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}50%{transform:translateX(8px)}75%{transform:translateX(-5px)}}
+
+@media(min-width:700px){
+  .app{gap:12px}
+  .hud-item{padding:10px 12px}
+  .hud-item label{font-size:10px}
+  #cop{font-size:110px}
+  #copZone{width:190px;height:220px}
+  #copBubble{left:74px;bottom:182px;font-size:12.5px}
+  .strobe{width:64px}
+}
+</style>
+</head>
+<body>
+<div class="strobe l"></div>
+<div class="strobe r"></div>
+
+<div class="app">
+  <header class="topbar">
+    <div class="ttl">
+      <h1>ГОС-ОТКАТ <em>2026</em></h1>
+      <div class="gov-sub">симулятор освоения бюджета: подпишите всё и не сядьте</div>
+    </div>
+    <div class="topbtns">
+      <button class="tbtn" id="rulesBtn" title="памятка">📜</button>
+      <button class="tbtn" id="newsBtn" title="лента новостей">📰</button>
+      <button class="tbtn" id="musicBtn" title="музыка">🎵</button>
+      <button class="tbtn" id="sndBtn" title="звук">🔊</button>
+    </div>
+  </header>
+
+  <div class="hud">
+    <div class="hud-item">
+      <label>Освоено бюджета</label>
+      <b id="hudSpent">0,0</b>
+      <i class="hud-sub">цель: 100 млрд</i>
+      <div class="bar"><span id="barSpent"></span></div>
+    </div>
+    <div class="hud-item">
+      <label>Откат в карман</label>
+      <b id="hudKick">0 ₽</b>
+      <i class="hud-sub" id="kickSub">в кармане ветер</i>
+    </div>
+    <div class="hud-item">
+      <label>Интерес прокуратуры <span class="heart calm" id="heart">🫀</span></label>
+      <b id="hudRisk">0%</b>
+      <i class="hud-sub" id="riskSub">тихо, как в архиве</i>
+      <div class="bar red"><span id="barRisk"></span></div>
+      <div class="pulse-line">пульс: <b id="pulse">64</b></div>
+    </div>
+  </div>
+
+  <main class="stage">
+    <div class="stack" id="stack"></div>
+    <div class="actions">
+      <button class="act reject" id="btnReject">❌ ОТКЛОНИТЬ</button>
+      <button class="act bribe" id="btnBribe">🤝 ВЗЯТКА −1,0 млрд</button>
+      <button class="act sign" id="btnSign">✅ ПОДПИСАТЬ</button>
+    </div>
+    <div class="turnbar">⏳ До конца квартала: <b id="hudMoves">40</b> <span id="movesWord">ходов</span></div>
+    <div class="verdict" id="verdict">На столе первый тендер. Министерство ждёт вашей подписи. Памятка — 📜, новости — 📰.</div>
+  </main>
+</div>
+
+<!-- ПАМЯТКА -->
+<div class="sheet-wrap" id="rulesPanel" hidden>
+  <div class="np-back" id="rpBack"></div>
+  <div class="np-sheet">
+    <div class="np-head">📜 ПАМЯТКА ОТВЕТСТВЕННОГО ЛИЦА <span class="live">ДСП</span>
+      <button class="np-close" id="rpClose">✕</button>
+    </div>
+    <div class="rules">
+      <div class="r-stamp">УТВЕРЖДАЮ. НИКЕМ. НИКОГДА.</div>
+      <h4>Памятка ответственного лица по освоению средств федерального бюджета</h4>
+      <div class="r-item"><b>1.</b>Бюджетные средства — не ваши. Однако распоряжаться ими надлежит так, как будто они ваши. До момента, пока не станут.</div>
+      <div class="r-item"><b>2.</b>Подписание тендера является освоением. Средства, полученные за подпись (далее — «откат»), с момента получения считаются вашей собственностью, декларированию не подлежат и хранятся там, где вам удобно.</div>
+      <div class="r-item"><b>3.</b>Перед подписанием обязательно изучите строку «из протокола». Если подрядчик является чьим-либо родственником, подписание безопасно: родственники охраняются государством. Если подрядчик находится в розыске — подписание является неоправданным риском, отказ является мудростью.</div>
+      <div class="r-item"><b>4.</b>Отклонять своих людей настоятельно не рекомендуется. Свои люди запоминают.</div>
+      <div class="r-item"><b>5.</b>Взятка снижает интерес прокуратуры, но повышает аппетит прокуратуры. Каждая следующая взятка дороже предыдущей. Это не жадность, это индексация.</div>
+      <div class="r-item"><b>6.</b>Прокуратура может позвонить. Ответ на звонок является знаком уважения и снижает интерес. Не отвечать тоже можно, но это запомнят, запишут и приобщат.</div>
+      <div class="r-item"><b>7.</b>При высоком уровне интереса возможны стук в дверь и люди в форме. Это нормальная часть рабочего процесса. Предотвращению не подлежит.</div>
+      <div class="r-item"><b>8.</b>Бухгалтерия заметает следы в непрерывном режиме. Как она это делает — не спрашивайте. Просто имейте в виду.</div>
+      <div class="r-item"><b>9.</b>Цель квартала: освоить 100 миллиардов до того, как закончатся ходы или интерес прокуратуры достигнет 100%. Что наступит раньше, то и станет вашей биографией.</div>
+      <div class="r-item"><b>10.</b>Помните: это не игра. Это тренажёр профессионального мастерства. Администрация не несёт ответственности за приобретённые вами навыки.</div>
+      <div class="r-sign">С памяткой ознакомлен. Расписаться не могу: ручки золотые, бумага не та.</div>
+    </div>
+  </div>
+</div>
+
+<!-- НОВОСТИ -->
+<div class="sheet-wrap" id="newsPanel" hidden>
+  <div class="np-back" id="npBack"></div>
+  <div class="np-sheet">
+    <div class="np-head">📰 ЛЕНТА ДНЯ <span class="live">ПРЯМОЙ ЭФИР</span>
+      <button class="np-close" id="npClose">✕</button>
+    </div>
+    <div id="newsFeed"></div>
+  </div>
+</div>
+
+<!-- звонок -->
+<div id="callUI" hidden>
+  <div class="call-icon">📞</div>
+  <div class="call-txt">
+    <b>Входящий звонок</b>
+    <span>Прокуратура. Отдел по вам.</span>
+    <i>номер скрыт (но все всё поняли)</i>
+  </div>
+  <div class="call-btns">
+    <button id="callAns">Ответить</button>
+    <button id="callDecl">Не брать</button>
+  </div>
+  <div id="callTimer"></div>
+</div>
+
+<!-- полицейский -->
+<div id="copZone" aria-hidden="true">
+  <div id="copBubble"></div>
+  <div id="cop">👮‍♂️</div>
+  <div id="copWall"></div>
+</div>
+
+<!-- ОМОН -->
+<div id="raid" hidden>
+  <div class="raid-txt">ВСЕМ ЛЕЖАТЬ!<br>РАБОТАЕТ ОМОН!
+    <small>документы не уничтожать · деньги на стол · яхту не греть</small>
+  </div>
+</div>
+
+<div class="overlay" id="overlay"></div>
+
+<!-- ПАРОЛЬ -->
+<div id="lock">
+  <div class="lock-card" id="lockCard">
+    <div class="l-emoji">🗝️</div>
+    <h2>СЛУЖЕБНЫЙ ВХОД</h2>
+    <p>Данная страница является объектом федеральной программы.<br>Для входа предъявите пароль, выданный ответственным лицом.</p>
+    <input id="lockPass" type="password" placeholder="••••••••" autocomplete="off">
+    <button id="lockBtn">ВОЙТИ</button>
+    <div id="lockErr"></div>
+  </div>
+</div>
+
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+const GOAL = 100, MAXMOVES = 40;
+let spent = 0, kick = 0, risk = 0, moves = MAXMOVES, signed = 0, rejected = 0;
+let busy = false, ended = false, soundOn = true, newsOpen = false;
+let bribeCost = 1, bribes = 0, bribeSpent = 0;
+
+const TENDERS = [
+ {t:'Импортозамещение сыра путём его закапывания', org:'Минсельхоз', sum:4.2, d:'40 тонн «почти пармезана» закладываются в землю и выдерживаются до победного. Дегустация обязательна, отчёт — по факту съеденного.', n:'учредитель подрядчика — племянник министра', tag:'крыша'},
+ {t:'Разработка отечественного смартфона «Айфон»', org:'Минцифры', sum:9.7, d:'Прототип готов: это чехол от старого айфона. Осталось приклеить логотип берёзки и подать заявку на рекорд.', n:'подрядчик в международном розыске', tag:'палево'},
+ {t:'Утепление воздуха в Мурманской области', org:'Минэнерго', sum:7.3, d:'Тепловые пушки направлены в небо. Эффект обещают к третьему кварталу следующего года, максимум — к пятому.', n:'директор подрядчика играет с вами в гольф по субботам', tag:'свой'},
+ {t:'Закупка 10 000 невидимых скамеек', org:'Минстрой', sum:1.8, d:'Скамейки существуют, но в рамках импортозамещения их никто не видит. Установка за счёт подрядчика.', n:'прошлый подрядчик сгорел. Вместе с документами.', tag:'палево'},
+ {t:'Ремонт дорог молитвой и щебнем', org:'Росавтодор', sum:6.6, d:'Методика одобрена одновременно патриархией и Росстандартом. Щебень освящён, молитва сертифицирована.', n:'согласовано на самом верху', tag:'крыша'},
+ {t:'Освоение Луны (предоплата 100%)', org:'Роскосмос', sum:9.9, d:'Ракета будет. Потом. Сначала — дизайн-проект ракеты, затем презентация дизайн-проекта, затем банкет.', n:'подрядчик — ваш одноклассник. Он помнит.', tag:'свой'},
+ {t:'Покраска травы перед приездом комиссии', org:'Областная администрация', sum:0.9, d:'Краска зелёная, трава жёлтая, комиссия едет уже завтра. Работы ведутся круглосуточно, художники на вес золота.', n:'нарушений не выявлено (пока)', tag:'обычный'},
+ {t:'Закупка золотых ручек для важных бумаг', org:'Управделами', sum:1.2, d:'Ручки необходимы для повышения важности бумаг. Бумаги закуплены отдельным тендером, но тоже золотые.', n:'поставщик — племянник управделами', tag:'крыша'},
+ {t:'Строительство моста через реку, которой нет', org:'Росавтодор', sum:8.4, d:'Река запланирована на следующий год отдельным тендером. Мост нужен уже сейчас — так решили.', n:'прокуратура уже дважды интересовалась', tag:'палево'},
+ {t:'Поставка компаса, указывающего на бюджет', org:'Минобороны', sum:3.3, d:'Секретная разработка. Описание засекречено. Сумма засекречена. Результат засекречен заранее.', n:'гриф «секретно». Никто не читал.', tag:'обычный'},
+ {t:'Импортозамещение совести', org:'Управление делами', sum:2.7, d:'Отечественный аналог дешевле импортного, работает дольше, побочных эффектов не выявлено.', n:'поставщик — фонд «Свои Люди»', tag:'свой'},
+ {t:'Пошив деловых костюмов для голубей администрации', org:'Администрация', sum:0.6, d:'Голуби должны выглядеть солидно на заседаниях. Размеры сняты, голуби предупреждены, портной плачет.', n:'портной — брат заместителя', tag:'крыша'},
+ {t:'Установка камер, которые никто не смотрит', org:'МВД', sum:5.1, d:'40 тысяч камер, один монитор, вахтёр Петрович. Петрович не справляется, но держится.', n:'подрядчик проходит по другому делу', tag:'палево'},
+ {t:'Завод по производству заводов', org:'Минпромторг', sum:8.8, d:'Первый завод уже производит второй. Второй будет производить первый. Цикл замкнётся к 2031 году.', n:'проект одобрен лично', tag:'крыша'},
+ {t:'Реконструкция входа в сносимое здание', org:'Минстрой', sum:1.4, d:'Здание снесут завтра, но вход должен быть красивым сегодня. Приоритеты расставлены верно.', n:'сроки горят, как и здание', tag:'обычный'},
+ {t:'Проведение форума «Как проводить форумы»', org:'Минэкономразвития', sum:2.2, d:'Трёхдневный форум, банкет включён. Итогом станет форум по итогам форума. Регистрация платная.', n:'организатор — ваш бывший деловой партнёр', tag:'свой'},
+ {t:'Аренда вертолёта для доставки степлера', org:'Почта России', sum:0.8, d:'Степлер срочный. Логистика оптимизирована: 42 минуты вместо трёх недель. Степлер доставлен.', n:'пилот — зять начальника логистики', tag:'крыша'},
+ {t:'Закупка кресел с подогревом для зала заседаний', org:'Государственная дума', sum:3.9, d:'Кресла должны согревать сердца через спины. Температура регулируется по степени важности вопроса.', n:'прошлый поставщик отбывает', tag:'палево'},
+ {t:'Потёмкинская деревня 2.0 (с подсветкой)', org:'Минкульт', sum:5.5, d:'Фасады, подсветка, аниматоры в окнах. Демонтаж после визита делегации входит в смету.', n:'художник — член вашего клуба', tag:'свой'},
+ {t:'Модернизация граблей', org:'Роскосмос', sum:4.4, d:'Грабли нового поколения не наступают на себя. Тестирование на добровольцах уже идёт, добровольцы в порядке.', n:'НИИ граблей существует с 1987 года', tag:'обычный'},
+ {t:'Строительство метро в деревне Малые Козлы', org:'Мэрия', sum:7.7, d:'Население — 14 человек и коза. Метро необходимо для повышения мобильности козы в первую очередь.', n:'глава деревни — двоюродный брат мэра', tag:'крыша'},
+ {t:'Нейросеть для одобрения тендеров', org:'Минцифры', sum:6.1, d:'Нейросеть обучается на примерах. Все примеры — «одобрено». Обучится за неделю, максимум за две.', n:'разработчик зарегистрирован вчера', tag:'палево'},
+ {t:'Огнетушители без огнетушащего вещества', org:'МЧС', sum:1.9, d:'Вещество импортное, поэтому его нет. Огнетушители лёгкие, красивые, честные. Гореть не рекомендуется.', n:'инспекция уже выехала', tag:'палево'},
+ {t:'Флаги для митинга «За экономию бюджета»', org:'Администрация', sum:0.5, d:'Митинг пройдёт с размахом. Экономия — потом, в следующем квартале.', n:'типография принадлежит вам. То есть партнёру.', tag:'свой'},
+ {t:'Стадион на болоте (дренаж не предусмотрен)', org:'Минспорт', sum:8.1, d:'Дренаж удорожает смету. Болото письменно обещало не затапливать поле — гарантия подписана.', n:'гарантия подписана на салфетке', tag:'обычный'},
+ {t:'Резервная копия резервной копии бюджета', org:'Минфин', sum:3.1, d:'Третья копия хранится на флешке у заместителя. Флешка — под подушкой. Так надёжнее.', n:'флешка уже утеряна дважды', tag:'обычный'},
+ {t:'Часовня на месте спиленного парка', org:'Минкульт', sum:2.4, d:'Парк спилили ради парка. Потом передумали. Теперь часовня. Логика железная, как забор вокруг.', n:'подрядчик — фонд «Светлый Путь» (свой)', tag:'свой'},
+ {t:'Вода премиум-класса для кулеров министерства', org:'Управделами', sum:1.1, d:'Вода альпийская, но отечественная: Альпы переименованы постановлением. Вкус прежний, патриотизм выше.', n:'источник находится в подвале подрядчика', tag:'обычный'},
+ {t:'Антистресс-игрушки в виде тендерной документации', org:'Минздрав', sum:0.7, d:'Мялка в виде стопки бумаг снимает стресс у 94% чиновников. Остальные 6% не умеют мять.', n:'сертификат подлинности отсутствует', tag:'палево'},
+ {t:'Освоение остатков бюджета (декабрь)', org:'Все министерства', sum:9.5, d:'Осталось 11 дней. Нужно потратить всё, иначе в следующем году дадут меньше. Смысл работ: потратить.', n:'классика жанра. Все так делают.', tag:'обычный'},
+ {t:'Закупка 3 млн единиц «чего-нибудь нужного»', org:'Минэкономразвития', sum:5.8, d:'Спецификация уточняется. Поставщик предлагает что-нибудь нужное. Комиссия согласна. Все согласны.', n:'поставщик — свой человек', tag:'свой'},
+ {t:'Памятник самому себе (согласовано)', org:'Районная администрация', sum:2.9, d:'Памятник скромный, 12 метров. Поза — «вглядывается в светлое будущее». Постамент из мрамора.', n:'скульптор — зять. Но это совпадение.', tag:'крыша'},
+ {t:'Покраска забора при каждой смене власти', org:'Администрация', sum:0.4, d:'Забор красится в цвет новой власти. Краска закуплена сразу на все цвета. Забор уже грунтован.', n:'маляр — свидетель по делу о прошлом заборе', tag:'палево'},
+ {t:'Макароны из Сколково вместо итальянских', org:'Минпромторг', sum:3.6, d:'Инновационные макароны. Варятся через приложение. Приложение не работает, но макароны вкусные.', n:'стартап вашего бывшего однокурсника', tag:'свой'},
+ {t:'Реновация луж по программе «Глубина»', org:'ЖКХ', sum:2.1, d:'Лужи углубляются, асфальт кладётся поверх. Лужи обещано сохранить как объект культурного наследия.', n:'дорожный мастер — муж вашей бухгалтерши', tag:'свой'},
+ {t:'Импортозамещение бананов: бананы из Воркуты', org:'Минсельхоз', sum:3.2, d:'Теплицы уже построены, бананы уже ждут. Форму изогнули вручную, вкус дорабатывается.', n:'агроном проходит свидетелем по делу о теплицах', tag:'палево'},
+ {t:'Парковка на месте парка, парковки и рынка', org:'Мэрия', sum:4.7, d:'Всё уже снесено, осталось построить. Проект согласован со всеми, кроме тех, кто там жил.', n:'архитектор ужинает с мэром по вторникам', tag:'крыша'},
+ {t:'Будильники для совещаний в 9 утра', org:'Минтруд', sum:0.5, d:'Закупка 800 единиц повышенной громкости. Совещания переносятся на 11:00, но будильники нужны уже сейчас.', n:'поставщик зарегистрирован в офшоре. В каком — секрет.', tag:'палево'},
+ {t:'Зеркала «взглянуть свежим взглядом»', org:'Минэкономразвития', sum:1.3, d:'Зеркала закуплены для отчётности и самокритики. Критика не предусмотрена комплектацией.', n:'зеркальщик — член вашего клуба', tag:'свой'},
+ {t:'Освоение Арктики силами одного энтузиаста', org:'Минвостокразвития', sum:6.8, d:'Энтузиаст уже выехал. У него палатка, флаг и безлимитный интернет. Остальное — по факту освоения.', n:'энтузиаст — чей-то энтузиаст, но чей — догадайтесь', tag:'обычный'}
+];
+
+const SIGN_TXT = {
+ krysha:[
+  'Подписано. Откат приехал в багажнике уже к обеду: курьер — зять министра, поэтому вопросов не возникло ни у кого. В акте, на всякий случай, написано «поставка воздуха».',
+  'Одобрено. Распилили красиво, по ГОСТу, с музыкой. Акт выполненных работ подписан заранее — ещё до того, как работы были придуманы.',
+  'Подпись поставлена золотой ручкой, рука не дрогнула. Куда пошли деньги — никто не спрашивал, потому что спрашивать было некому: все в доле.'
+ ],
+ svoi:[
+  'Свой человек — свои правила. Откат принесли прямо в кабинет в коробке из-под степлера, хотя степлеры у вас давно золотые.',
+  'Подписано. Подрядчик лично передал «спасибо» и конверт. Конверт оказался подозрительно тяжёлым, что очень приятно.',
+  'Одобрено без конкурса: конкурс провёл сам подрядчик, среди своих, и победили, естественно, свои. Откат уже в сейфе.'
+ ],
+ palevo_ok:[
+  'Проскочило. Подрядчик, конечно, в розыске, зато откат — наличными и без лишних вопросов. Кто-то вас сфотографировал, но потом удалил снимок. Сам удалил.',
+  'Рискнули — и выиграли. Правда, прокуратура теперь знает ваше отчество и кличку вашей собаки, но это уже мелочи.'
+ ],
+ palevo_bad:[
+  'Вы подписали — и через час нагрянула проверка, как будто ждала за дверью. Откат изъяли как вещдок и куда-то унесли. Еле отмазались, и то не до конца.',
+  'Подписали. Подрядчик скрылся с деньгами в тот же вечер, даже чаю не допил. Следователь теперь смотрит на вас с профессиональным интересом.'
+ ],
+ obychno_ok:[
+  'Подписано. Бюджет освоен красиво: часть — по назначению, остальная часть — по вашему назначению. Отчёт красивый, шрифт — с засечками.',
+  'Одобрено. Акт приёмки подписан вслепую, как положено по регламенту. Комиссия расписалась и ушла на обед.'
+ ],
+ obychno_inspect:[
+  'Подписали — и тут же внеплановая проверка, вторая за неделю. Часть отката пришлось срочно «заморозить» в трёх разных сейфах.',
+  'Одобрено, но кто-то настучал. Пока прокуратура листает документы, вы листаете нервную ленту новостей про себя.'
+ ],
+ obychno_scandal:[
+  'Подписали, но всплыли фото со стройки: рабочие играют в карты на фоне отсутствующего объекта. Половину пришлось вернуть, чтобы замять. Остальное замяли.',
+  'Одобрено, но журналисты уже выехали. Часть денег возвращена с формулировкой «техническая ошибка», остальное — с формулировкой «какая ошибка?»'
+ ]
+};
+const REJ_TXT = {
+ svoi:[
+  'Вы отказали своему же человеку. Теперь он здоровается сквозь зубы, играет в гольф с кем-то другим и кому-то очень настойчиво звонит.',
+  'Отклонили подрядчика, с которым у вас гольф по субботам. Суббота будет неловкой, а партнёрство — под вопросом.'
+ ],
+ palevo:[
+  'Мудрое решение: этот подрядчик уже под подпиской о невыезде, а чемоданы собраны с прошлого года. Прокуратура одобрительно кивнула и поставила галочку.',
+  'Правильно. Прошлый, кто это подписал, передаёт привет из санатория особого режима. Там, говорят, неплохая столовая, но вы же не туда стремились.'
+ ],
+ krysha:[
+  'Вы отклонили тендер человека министра. Он не расстроился. Он запомнил. И записал. В отдельный блокнот с кожаной обложкой.',
+  'Отказ согласованному тендеру. Где-то тихо заплакал чей-то зять, а в министерстве внезапно сломался именно ваш кондиционер.'
+ ],
+ obychno_ok:[
+  'Отказ. Документы ушли в архив, архив — в подвал, подвал затопило по естественным причинам. Идеальная цепочка, комар носа не подточит.',
+  'Отклонено по форме 39-Б. Никто в стране не знает, что такое форма 39-Б. В этом и заключался план.'
+ ],
+ obychno_bad:[
+  'Отказали, но прокуратура заинтересовалась: почему не подписано, кто виноват и что им за это будет. Кто-то уже строчит запрос.',
+  'Отклонено. Внезапно обнаружились три жалобы, один депутатский запрос и одно расследование с очень громким заголовком.'
+ ]
+};
+const BRIBE_OK = [
+  'Прокурор посмотрел на конверт, конверт исчез. Дело переложено в папку «Разобрать позже». В папке уже лежит три таких же.',
+  'Взятка принята с улыбкой. Прокурор внезапно ушёл в отпуск, причём туда, где нет связи и совести.',
+  'Конверт передан через надёжного человека. Прокуратура резко заинтересовалась другим делом — каким-то Игорем.',
+  'Прокурор всё понял, всё простил и забыл номер вашего дела. Такое не забывается, но он постарался.'
+];
+const BRIBE_JACK = [
+  'Прокурор оказался неожиданно скромным: взял только половину и списал всё внимание разом. Таких прокуроров надо беречь.'
+];
+const BRIBE_BAD = [
+  'Прокурор взял конверт... и удвоил внимание. Оказалось, мало. Теперь он следит принципиально, из чувства долга.',
+  'Прокурор оказался честным. Кто же знал. Конверт приобщили к делу как вещдок, а вас — как интересное наблюдение.',
+  'Взятка передана под запись. Оперативники уже монтируют ролик и подбирают музыку. Внимание прокуратуры подскочило.'
+];
+const CALL_LINES = [
+  'Вы: Алло?.. Собеседник молчит и дышит в трубку. Потом кладёт её на стол. Отчётливо слышно, как печатается протокол.',
+  'Вы: Алло? Не слышно, я в тоннеле! Тоннель внезапно закончился, но было уже поздно: разговор записан и приобщён.',
+  '«Это из прокуратуры. Просто звоним. Просто чтобы вы знали: мы существуем.» Гудки. Долгие.',
+  'Вы: Ошиблись номером! В ответ пауза и: «Мы не ошибаемся.» Потом почему-то извинились и положили трубку.'
+];
+const WIN_TXT = [
+  'Бюджет освоен на 100%. Яхта уже греет двигатель, слитки аккуратно уложены в трюме. В министерстве не осталось ни копейки — даже на скрепки.',
+  'Сто миллиардов освоены. Золото ваше, море ваше, совесть — как обычно, ничья. Красивая жизнь начинается сегодня, но не возвращайтесь.',
+  'Освоено всё. Комиссия аплодирует, яхта ждёт у причала, слитки блестят. Памятник при жизни уже согласован — по госконтракту, втридорога.'
+];
+const PRISON_TXT = [
+  'Приговор: три года условно и штраф 800 рублей. Потерпевшая сторона — вся страна. Полицейский из угла наконец вышел и широко улыбнулся.',
+  'Вас взяли прямо на награждении. Медаль изъяли как вещдок. К сожалению, красивая была медаль.',
+  'Следователь оказался вежливым: даже разрешил доиграть партию в гольф. Подрядчик, кстати, уже давал показания против вас. Давно.'
+];
+const BURN_TXT = [
+  'Квартал кончился, а бюджет освоен не весь. Неосвоенное вернулось в Минфин, и кто-то там плакал. Такого здесь не прощают.',
+  'Вас уволили по статье «недоосвоение». В трудовой написали: «слишком честный». Это оскорбление, и все это поняли.'
+];
+
+const pick = a => a[Math.random()*a.length | 0];
+function plural(n, one, few, many){
+  const m = Math.abs(n) % 100, d = m % 10;
+  if(m > 10 && m < 20) return many;
+  if(d > 1 && d < 5) return few;
+  if(d === 1) return one;
+  return many;
+}
+function kickFmt(k){
+  if(k >= 1) return k.toFixed(1).replace('.', ',') + ' млрд ₽';
+  if(k >= 0.001) return Math.round(k*1000) + ' млн ₽';
+  return '0 ₽';
+}
+
+/* ═══ НОВОСТИ ═══ */
+const OUTLETS = ['Ъ-НОВОСТИ','ТАЙНЫЙ СОВЕТНИК','РЕН-ЗОЛОТО','ПРАВДА-ЛАЙФ','КОМПРОМАТ-ТВ','ВЕСТИ ИЗ-ПОД СТОЛА','ИНТЕР-ШВАБРА','РОССИЯ-ЗАВТРА'];
+const NAME_SLIPS = [
+  ' По данным источников, ключевую роль сыграл некий Дмитрий Михайлович.',
+  ' В документах мелькнула подпись «Д.М.». Совпадение, конечно.',
+  ' Свидетели упоминают Дмитрия Михайловича. Дмитрий Михайлович всё отрицает.',
+  ' Источник утверждает: без Дмитрия Михайловича тут не обошлось.',
+  ' На месте событий видели человека, похожего на Дмитрия Михайловича. Человек отвернулся.'
+];
+const IDLE_NEWS = [
+  'В министерстве переклеили обои. Освоение идёт по плану, обои — по смете.',
+  'Комиссия ушла на обед. Обед тоже проведён по тендеру. Победил ресторан председателя.',
+  'Голуби администрации получили зимнюю форму. Форма сидит строго, голуби довольны.',
+  'Бухгалтерия свела квартальный отчёт. Отчёт сошёлся. С совестью — нет.',
+  'В архиве затопило подвал. Эксперты называют причину «естественной и своевременной».',
+  'Предыдущий фигурант подал апелляцию из санатория особого режима. Апелляция вежливая.',
+  'Коза из деревни Малые Козлы лично проинспектировала стройку метро. Коза довольна.',
+  'Курс фишки к рублю не изменился и составил 0,00. Аналитики называют это стабильностью.',
+  'Вахтёр Петрович заступил на смену. Сорок тысяч камер под надёжным присмотром.',
+  'В столовой министерства снова подали устрицы. Бюджетные, импортозамещённые, с Дальнего Востока через Альпы.',
+  'Метеорологи обещают в министерстве осадки в виде проверок. Местами сильных.'
+];
+const LUX_NEWS = [
+  'Очевидцы: у здания министерства замечен новый вертолёт. Чей — уточняется. Пока ничей.',
+  'В закрытом посёлке продан дом площадью «небольшой вокзал». Покупатель скромничает.',
+  'Кто-то купил третий гараж. Первые два ещё не построены.',
+  'В ресторане на Рублёвке заказали устрицы на весь зал. Кто — догадайтесь.',
+  'Золотой унитаз признан объектом культурного наследия отдельно взятого кабинета.',
+  'Автомобильный номер А001АМР продан с аукциона. Кому — секрет, но все догадываются.',
+  'Яхта замечена в порту. Владелец указан как «лицо, которому повезло».',
+  'Кто-то оплатил школьный спортзал. Чек не сохранился. Совпадение, безусловно.',
+  'В гардеробе замечена шуба. Шуба заметила всех первой.',
+  'Офшор на острове, которого нет на картах, сменил бенефициара. Опять.',
+  'Ювелирный дом выпустил коллекцию «Для тех, кто освоил». Коллекция уже распродана.'
+];
+const SIGN_NEWS_BASE = [
+  'Тендер «{T}» согласован без замечаний. Комиссия довольна и уже уехала на банкет.',
+  'Контракт «{T}» подписан. Сроки названы «смелыми», смета — «философской».',
+  '«{T}»: работы начнутся завтра. Или не начнутся. Отчёт будет в любом случае.',
+  'По тендеру «{T}» всё чисто. Настолько чисто, что даже подозрительно.',
+  '«{T}» одобрен единогласно. Кто голосовал — история умалчивает.',
+  'Эксперты оценили проект «{T}» положительно. Эксперты оценили всё положительно.'
+];
+const REJ_NEWS = [
+  'Тендер отклонён. Причины названы «внутренними». Внутренности не разглашаются.',
+  'Отказ оформлен по всей форме. Форма никому не понравилась, но спорить не стали.',
+  'Комиссия отклонила тендер и тут же заскучала. Освоение не ждёт, а тут отказ.',
+  'По факту отказа назначена проверка. По факту проверки назначен банкет.',
+  'Подрядчик сделал вид, что не расстроился. Получилось плохо.'
+];
+const BRIBE_OK_NEWS = [
+  'Источники: в кабинете прокурора замечен тяжёлый конверт. Конверт похудел, прокурор подобрел.',
+  'Дело о хищениях переложено в папку «Разобрать позже». Папка, по слухам, бездонная.',
+  'Прокурор ушёл в отпуск. Направление: туда, где нет связи, совести и этого дела.',
+  'Прокуратура внезапно заинтересовалась другим делом. Каким — догадайтесь сами.'
+];
+const BRIBE_BAD_NEWS = [
+  'Конверт приобщён к материалам дела как вещдок. С пометками «крупный» и «улика».',
+  'Оперативная съёмка ведётся уже второй час. Монтаж обещают зрелищный, со звуком.',
+  'Прокурор от взятки отказался. И почему-то очень обиделся. Теперь следит принципиально.'
+];
+const ESC_NEWS = {
+ 30:['Компетентные органы проявили интерес к госзакупкам. Интерес пока академический.',
+     'Эксперты обсуждают: кто-то осваивает бюджет подозрительно быстро и красиво.'],
+ 45:['Прокуратура запросила документы. Все. Потом подумала и попросила ещё раз все.',
+     'В министерстве прошла выемка серверов. Серверы держались достойно.'],
+ 60:['Источники: фигурантом дела о хищениях может стать высокопоставленное лицо. Лицо покачивается.',
+     'Следственная группа расширена. В неё вошли люди в масках. На всякий случай.'],
+ 75:['Фигуранту ограничили выезд. Аэропорты предупреждены, порты — тоже, яхты — особенно.',
+     'Адвокаты фигуранта замечены у здания прокуратуры. Выглядят уставшими, но опрятно.'],
+ 90:['ОМОН переведён в режим готовности. Повод не уточняется: и так всё понятно.',
+     'У здания министерства замечены автозаки. Много автозаков. Очень много.']
+};
+const SEED_NEWS = [
+  ['ОФИЦИАЛЬНО','','Объявлен сезон освоения бюджета. Эксперты единодушны: сезон будет жарким.'],
+  ['ОФИЦИАЛЬНО','','Министерство получило 100 миллиардов на импортозамещение. Получило и сразу напряглось.'],
+  ['ИСТОЧНИКИ','green','Ответственным за освоение назначен Дмитрий Михайлович. Дмитрий Михайлович пока не знает об этом.'],
+  ['НАБЛЮДЕНИЕ','blue','Прокуратура заявила, что следит за процессом. Процесс сделал вид, что не заметил.']
+];
+const WIN_NEWS = [
+  'Бюджет освоен полностью. Минфин подтверждает: не осталось даже на скрепки.',
+  'Яхта покинула порт. Направление: туда, где нет прокуроров. Слитки задекларированы как «сувениры».'
+];
+const PRISON_NEWS = [
+  'Спецоперация завершена успешно. Задержан один. Сопротивлялся вежливо, лежал лицом в пол с достоинством.',
+  'При задержании фигурант пытался позвонить зятю министра. Зять не взял трубку. Дважды.'
+];
+const BURN_NEWS = ['Неосвоенные средства возвращены в Минфин. В министерстве траур и перекличка виноватых.'];
+
+function maybeName(txt){ return Math.random() < 0.18 ? txt + pick(NAME_SLIPS) : txt; }
+
+function news(txt, tag, tagCls){
+  const feed = $('#newsFeed');
+  const el = document.createElement('div');
+  el.className = 'n-item';
+  const time = new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+  el.innerHTML =
+    `<div class="n-top"><b class="n-tag ${tagCls||''}">${tag||'НОВОСТИ'}</b>` +
+    `<span class="n-src">${pick(OUTLETS)}</span><span class="n-time">${time}</span></div>` +
+    `<div class="n-txt">${txt}</div>`;
+  feed.prepend(el);
+  while(feed.children.length > 16) feed.lastChild.remove();
+  if(!newsOpen) $('#newsBtn').classList.add('fresh');
+}
+function openNews(){ newsOpen = true; $('#newsPanel').hidden = false; $('#newsBtn').classList.remove('fresh'); }
+function closeNews(){ newsOpen = false; $('#newsPanel').hidden = true; }
+$('#newsBtn').onclick = openNews;
+$('#npClose').onclick = closeNews;
+$('#npBack').onclick = closeNews;
+$('#rulesBtn').onclick = () => { $('#rulesPanel').hidden = false; };
+$('#rpClose').onclick = () => { $('#rulesPanel').hidden = true; };
+$('#rpBack').onclick = () => { $('#rulesPanel').hidden = true; };
+
+/* ═══ ЗВУК ═══ */
+let AC = null, noiseBuf = null;
+function ensureAudio(){
+  try{
+    if(!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+    if(AC.state !== 'running'){
+      AC.resume().then(() => {
+        const b = AC.createBuffer(1, 1, 22050);
+        const s = AC.createBufferSource();
+        s.buffer = b; s.connect(AC.destination); s.start(0);
+      }).catch(()=>{});
+    }
+    startMusic();
+  }catch(e){}
+}
+document.addEventListener('visibilitychange', () => {
+  if(document.hidden){ stopMusic(); }
+  else if(AC && AC.state !== 'running'){ AC.resume(); }
+  else startMusic();
+});
+function tone(f, d, type, v){
+  if(!soundOn || !AC) return;
+  try{
+    const o = AC.createOscillator(), g = AC.createGain();
+    o.type = type || 'triangle'; o.frequency.value = f;
+    g.gain.setValueAtTime(v || .12, AC.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001, AC.currentTime + d);
+    o.connect(g); g.connect(AC.destination);
+    o.start(); o.stop(AC.currentTime + d);
+  }catch(e){}
+}
+function buildNoise(){
+  if(noiseBuf) return;
+  noiseBuf = AC.createBuffer(1, AC.sampleRate, AC.sampleRate);
+  const d = noiseBuf.getChannelData(0);
+  for(let i = 0; i < d.length; i++) d[i] = Math.random()*2 - 1;
+}
+function noiseBurst(dur, vol, freq, q){
+  if(!soundOn || !AC) return;
+  try{
+    buildNoise();
+    const src = AC.createBufferSource(); src.buffer = noiseBuf;
+    const f = AC.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = q || 0.8;
+    const g = AC.createGain();
+    g.gain.setValueAtTime(vol, AC.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001, AC.currentTime + dur);
+    src.connect(f); f.connect(g); g.connect(AC.destination);
+    src.start(); src.stop(AC.currentTime + dur);
+  }catch(e){}
+}
+const SFX = {
+  sign(){ noiseBurst(.12,.07,2400,1); setTimeout(()=>{tone(140,.09,'square',.12); tone(70,.12,'square',.1);},130); },
+  reject(){ noiseBurst(.2,.11,3400,.6); setTimeout(()=>noiseBurst(.12,.06,2800,.6),90); },
+  cash(){ tone(660,.09); setTimeout(()=>tone(880,.12),90); setTimeout(()=>tone(1100,.16),190); setTimeout(()=>tone(1560,.1,'sine',.06),290); },
+  alarm(){ tone(330,.15,'sawtooth',.09); setTimeout(()=>tone(220,.2,'sawtooth',.09),150); },
+  bribeOk(){ noiseBurst(.22,.09,5200,.7); setTimeout(()=>noiseBurst(.16,.06,4200,.7),120); setTimeout(()=>tone(990,.14),260); },
+  bribeBad(){ tone(2200,.04,'square',.08); noiseBurst(.05,.06,6000,2);
+    setTimeout(()=>tone(392,.16,'sawtooth',.06),150);
+    setTimeout(()=>tone(311,.16,'sawtooth',.06),300);
+    setTimeout(()=>tone(262,.22,'sawtooth',.06),450); },
+  ring(){ tone(920,.42,'sine',.05); tone(1160,.42,'sine',.05); },
+  knock(){ for(let i=0;i<3;i++) setTimeout(()=>tone(72,.13,'square',.24), i*240); },
+  crash(){ noiseBurst(.6,.35,280,.5); tone(60,.5,'square',.2); tone(48,.7,'square',.15); },
+  whistle(){ if(!soundOn||!AC) return;
+    try{
+      const o=AC.createOscillator(), g=AC.createGain();
+      o.type='square';
+      o.frequency.setValueAtTime(1800,AC.currentTime);
+      o.frequency.linearRampToValueAtTime(2600,AC.currentTime+.35);
+      o.frequency.linearRampToValueAtTime(1900,AC.currentTime+.7);
+      g.gain.setValueAtTime(.05,AC.currentTime);
+      g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+.8);
+      o.connect(g); g.connect(AC.destination);
+      o.start(); o.stop(AC.currentTime+.8);
+    }catch(e){} },
+  lose(){ tone(196,.2,'sawtooth',.08); setTimeout(()=>tone(147,.3,'sawtooth',.08),180); }
+};
+
+let hbT = null;
+function hbInterval(){ return risk < 12 ? 900 : Math.max(360, 1050 - risk*7); }
+function beatIcon(){
+  const h = $('#heart');
+  h.classList.remove('beat'); void h.offsetWidth; h.classList.add('beat');
+}
+function hbTick(){
+  clearTimeout(hbT);
+  if(risk >= 12 && soundOn && AC && !ended){
+    const v = .06 + risk*.0014;
+    tone(50,.09,'sine',v);
+    setTimeout(()=>tone(42,.08,'sine',v*.8),115);
+    beatIcon();
+  }
+  hbT = setTimeout(hbTick, hbInterval());
+}
+
+/* ═══ МУЗЫКА (весёлый марш освоения) ═══ */
+let musicOn = true, musicTimer = null, musicNext = 0, musicStep = 0;
+const MUSIC_STEP = 60 / 138 / 2;
+const BASS_PAT = [36,0,36,0,43,0,43,0, 45,0,45,0,41,43,36,0];
+const MEL_PAT  = [76,79,81,0,79,76,72,0, 74,77,81,79,0,76,74,72];
+const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+
+function mNote(f, t, d, type, v){
+  const o = AC.createOscillator(), g = AC.createGain();
+  o.type = type; o.frequency.value = f;
+  g.gain.setValueAtTime(v, t);
+  g.gain.exponentialRampToValueAtTime(.001, t + d);
+  o.connect(g); g.connect(AC.destination);
+  o.start(t); o.stop(t + d);
+}
+function noiseAt(t, vol, dur, freq){
+  buildNoise();
+  const src = AC.createBufferSource(); src.buffer = noiseBuf;
+  const f = AC.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = freq;
+  const g = AC.createGain();
+  g.gain.setValueAtTime(vol, t);
+  g.gain.exponentialRampToValueAtTime(.001, t + dur);
+  src.connect(f); f.connect(g); g.connect(AC.destination);
+  src.start(t); src.stop(t + dur);
+}
+function mKick(t){
+  const o = AC.createOscillator(), g = AC.createGain();
+  o.type = 'sine';
+  o.frequency.setValueAtTime(150, t);
+  o.frequency.exponentialRampToValueAtTime(45, t + .12);
+  g.gain.setValueAtTime(.09, t);
+  g.gain.exponentialRampToValueAtTime(.001, t + .14);
+  o.connect(g); g.connect(AC.destination);
+  o.start(t); o.stop(t + .15);
+}
+function musicSchedule(){
+  try{
+    while(musicNext < AC.currentTime + 0.35){
+      const s = musicStep % 16;
+      if(BASS_PAT[s]) mNote(mtof(BASS_PAT[s]), musicNext, .21, 'triangle', .07);
+      if(MEL_PAT[s]) mNote(mtof(MEL_PAT[s]), musicNext, .19, 'square', .026);
+      if(s % 4 === 0) mKick(musicNext);
+      if(s % 2 === 1) noiseAt(musicNext, .02, .05, 6000);
+      musicNext += MUSIC_STEP;
+      musicStep++;
+    }
+  }catch(e){}
+}
+function startMusic(){
+  if(!AC || musicTimer || !musicOn) return;
+  musicNext = AC.currentTime + 0.05;
+  musicTimer = setInterval(musicSchedule, 100);
+}
+function stopMusic(){
+  if(musicTimer){ clearInterval(musicTimer); musicTimer = null; }
+}
+$('#musicBtn').onclick = e => {
+  musicOn = !musicOn;
+  e.target.classList.toggle('off', !musicOn);
+  if(musicOn){ ensureAudio(); startMusic(); } else stopMusic();
+};
+$('#sndBtn').onclick = e => {
+  soundOn = !soundOn;
+  e.target.textContent = soundOn ? '🔊' : '🔇';
+  if(soundOn) ensureAudio();
+  hbTick();
+};
+document.addEventListener('pointerdown', () => ensureAudio(), {once:true});
+
+/* ═══ КОЛОДА ═══ */
+let deck = [];
+function draw(){
+  if(!deck.length){
+    deck = TENDERS.slice();
+    for(let i = deck.length - 1; i > 0; i--){
+      const j = Math.random()*(i+1) | 0;
+      const t = deck[i]; deck[i] = deck[j]; deck[j] = t;
+    }
+  }
+  return deck.pop();
+}
+let hand = [draw(), draw(), draw()];
+
+function cardEl(c, i){
+  const el = document.createElement('div');
+  el.className = 'card ' + (i ? 'back' : 'top');
+  if(i) el.style.setProperty('--i', i);
+  const num = 2026000 + Math.floor(Math.random()*999);
+  el.innerHTML =
+    `<div class="c-head">ТЕНДЕР №${num} <b>${c.org}</b></div>
+     <h3>${c.t}</h3>
+     <div class="c-sum">${c.sum.toLocaleString('ru-RU',{maximumFractionDigits:1})} млрд ₽</div>
+     <p class="c-desc">${c.d}</p>
+     <div class="c-note">📋 из протокола: ${c.n}</div>
+     <div class="stamp ok">ОДОБРЕНО</div>
+     <div class="stamp no">ОТКАЗАНО</div>`;
+  return el;
+}
+function renderStack(){
+  const st = $('#stack');
+  st.innerHTML = '';
+  hand.forEach((c, i) => st.appendChild(cardEl(c, i)));
+}
+
+const riskMarks = {30:false, 45:false, 60:false, 75:false, 90:false};
+function riskPhrase(r){
+  if(r >= 100) return 'взяли';
+  if(r >= 90)  return 'они уже в коридоре';
+  if(r >= 75)  return 'за вами выехали';
+  if(r >= 60)  return 'прокурор принюхивается к вам';
+  if(r >= 45)  return 'пахнет наручниками';
+  if(r >= 30)  return 'вашу фамилию уже гуглят';
+  if(r >= 15)  return 'кто-то листает ваше дело';
+  return 'тихо, как в архиве';
+}
+function kickPhrase(k){
+  if(k >= 80) return 'в список Форбс через чёрный вход';
+  if(k >= 50) return 'офшоры сами себя не купят';
+  if(k >= 30) return 'люблю я воровать. Приятно';
+  if(k >= 15) return 'может, школу построить? хахаха';
+  if(k >= 5)  return 'куда мне столько денег?';
+  if(k >= 1)  return 'неплохо. Продолжаем';
+  return 'в кармане ветер';
+}
+function copPhrase(r){
+  if(r >= 90) return 'Уже выехали. Открывайте!';
+  if(r >= 75) return 'Я всё вижу!';
+  if(r >= 50) return 'Кажется, что-то было...';
+  if(r >= 25) return 'Так-так-так...';
+  return '';
+}
+
+function updHud(){
+  $('#hudSpent').textContent = spent.toFixed(1);
+  $('#barSpent').style.width = Math.min(100, spent) + '%';
+  $('#hudKick').textContent = kickFmt(kick);
+  $('#kickSub').textContent = kickPhrase(kick);
+  $('#hudRisk').textContent = risk + '%';
+  $('#riskSub').textContent = riskPhrase(risk);
+  $('#barRisk').style.width = risk + '%';
+  $('#hudMoves').textContent = moves;
+  $('#movesWord').textContent = plural(moves, 'ход', 'хода', 'ходов');
+
+  $('#pulse').textContent = risk < 12 ? 64 : Math.round(62 + risk*1.3);
+  $('#heart').classList.toggle('calm', risk < 12);
+
+  $('#copZone').style.setProperty('--copX', (-130 + risk*1.26) + '%');
+  const cp = copPhrase(risk);
+  const b = $('#copBubble');
+  if(cp){ b.textContent = cp; b.classList.add('show'); }
+  else b.classList.remove('show');
+
+  document.body.classList.toggle('hot', risk >= 60);
+  document.body.classList.toggle('veryhot', risk >= 80);
+  $('#stack').classList.toggle('tremble', risk >= 80 && !ended);
+  hbTick();
+
+  for(const t in riskMarks){
+    if(risk >= t && !riskMarks[t]){
+      riskMarks[t] = true;
+      news(pick(ESC_NEWS[t]), 'СРОЧНО', 'red');
+    }
+  }
+}
+
+function showVerdict(txt, chips, kind){
+  const v = $('#verdict');
+  v.className = 'verdict' + (kind === 'bribe-ok' ? ' bribe-ok' : '');
+  v.innerHTML = (kind === 'bribe-ok' ? '<b class="v-hd">🎉 УРА! ВОРУЕМ ДАЛЬШЕ!</b>' : '') + txt +
+    '<div class="v-chips">' + chips.map(c => `<span class="chipd ${c.cls}">${c.txt}</span>`).join('') + '</div>';
+  v.scrollTop = 0;
+}
+
+function updBribeBtn(){
+  $('#btnBribe').textContent = '🤝 ВЗЯТКА −' + bribeCost.toFixed(1).replace('.', ',') + ' млрд';
+}
+
+/* ═══ ЗВОНОК ═══ */
+let callActive = false, callRinger = null, callTO = null, lastCallMove = -99;
+function maybeCall(){
+  if(callActive || ended || risk < 70) return;
+  if(moves - lastCallMove < 4) return;
+  if(Math.random() < 0.28) startCall();
+}
+function startCall(){
+  callActive = true;
+  lastCallMove = moves;
+  closeNews();
+  $('#rulesPanel').hidden = true;
+  $('#callUI').hidden = false;
+  ensureAudio();
+  SFX.ring();
+  callRinger = setInterval(SFX.ring, 1400);
+  let t = 7;
+  $('#callTimer').textContent = 'автоответ через ' + t + ' сек';
+  callTO = setInterval(() => {
+    t--;
+    $('#callTimer').textContent = 'автоответ через ' + t + ' сек';
+    if(t <= 0) endCall(false);
+  }, 1000);
+}
+function endCall(ans){
+  if(!callActive) return;
+  callActive = false;
+  clearInterval(callRinger); clearInterval(callTO);
+  $('#callUI').hidden = true;
+  if(ans){
+    risk = Math.max(0, risk - 6);
+    showVerdict(pick(CALL_LINES), [{cls:'good', txt:'интерес −6%'}]);
+    news('Звонок из прокуратуры состоялся. Разговор записан и приобщён. К чему приобщён — уточняется.', 'СРОЧНО', 'red');
+  } else {
+    risk = Math.min(100, risk + 8);
+    showVerdict('Вы сделали вид, что не слышите. Прокуратура сделала вид, что поверила. Потом перестала делать вид.', [{cls:'bad', txt:'интерес +8%'}]);
+    news('Звонок прокуратуры остался без ответа. Прокуратура запомнила номер. И лицо.', 'СРОЧНО', 'red');
+  }
+  updHud();
+  checkEnd();
+}
+$('#callAns').onclick = () => endCall(true);
+$('#callDecl').onclick = () => endCall(false);
+
+/* ═══ СТУК ═══ */
+let lastKnockMove = -99;
+function maybeKnock(){
+  if(ended || risk < 90) return;
+  if(moves - lastKnockMove < 3) return;
+  if(Math.random() < 0.4) doKnock();
+}
+function doKnock(){
+  lastKnockMove = moves;
+  const z = $('#copZone');
+  z.classList.remove('knock'); void z.offsetWidth; z.classList.add('knock');
+  const bb = $('#copBubble');
+  bb.textContent = pick(['ОТКРЫВАЙ! МЫ ЗНАЕМ, ЧТО ТЫ ТАМ!', 'ПОСЛЕДНИЙ РАЗ ПРОСИМ ПО-ХОРОШЕМУ!', 'ДВЕРЬ НЕ ЗАПЕРТА. МЫ ПРОВЕРИЛИ.']);
+  bb.classList.add('show');
+  document.body.classList.remove('quake'); void document.body.offsetWidth; document.body.classList.add('quake');
+  SFX.knock();
+  if(Math.random() < 0.5) news('У служебного входа замечены люди в форме. Стучат. Вежливо, но настойчиво.', 'НАБЛЮДЕНИЕ', 'red');
+}
+
+/* ═══ ДЕЙСТВИЯ ═══ */
+function act(sign){
+  if(busy || ended) return;
+  ensureAudio();
+  busy = true;
+  const c = hand[0];
+  const el = $('#stack .card.top');
+  el.classList.add(sign ? 'fly-r' : 'fly-l');
+  el.querySelector(sign ? '.ok' : '.no').classList.add('show');
+  sign ? SFX.sign() : SFX.reject();
+  setTimeout(() => {
+    resolve(c, sign);
+    hand.shift();
+    hand.push(draw());
+    renderStack();
+    busy = false;
+    checkEnd();
+    if(!ended){ maybeCall(); maybeKnock(); }
+  }, 430);
+}
+
+function resolve(c, sign){
+  moves--;
+  let dK = 0, dR = 0, extraS = 0, txt = '', chips = [];
+  const r = Math.random();
+
+  if(sign){
+    signed++;
+    if(c.tag === 'крыша'){
+      dK = c.sum*(0.30 + r*0.20); dR = 3 + (Math.random()*4 | 0);
+      txt = pick(SIGN_TXT.krysha);
+    } else if(c.tag === 'свой'){
+      dK = c.sum*(0.35 + r*0.20); dR = 1 + (Math.random()*3 | 0);
+      txt = pick(SIGN_TXT.svoi);
+    } else if(c.tag === 'палево'){
+      if(r < 0.55){ dK = c.sum*0.03; dR = 20 + (Math.random()*14 | 0); txt = pick(SIGN_TXT.palevo_bad); }
+      else { dK = c.sum*0.25; dR = 10 + (Math.random()*7 | 0); txt = pick(SIGN_TXT.palevo_ok); }
+    } else {
+      if(r < 0.22){ dK = c.sum*0.05; dR = 14 + (Math.random()*12 | 0); txt = pick(SIGN_TXT.obychno_inspect); }
+      else if(r < 0.36){ extraS = -c.sum*0.4; dK = c.sum*0.05; dR = 9 + (Math.random()*6 | 0); txt = pick(SIGN_TXT.obychno_scandal); }
+      else { dK = c.sum*(0.20 + r*0.15); dR = 3 + (Math.random()*5 | 0); txt = pick(SIGN_TXT.obychno_ok); }
+    }
+    spent = Math.max(0, spent + c.sum + extraS);
+    chips.push({cls:'gold', txt:`освоение +${(c.sum + extraS).toFixed(1)} млрд`});
+    if(dK > 0.005) chips.push({cls:'good', txt:`в карман +${dK.toFixed(1)} млрд`});
+    news(maybeName(pick(SIGN_NEWS_BASE).replace('{T}', c.t)), 'ИСТОЧНИКИ', 'green');
+    if(dK >= 2) news(maybeName(pick(LUX_NEWS)), 'ИСТОЧНИКИ', 'gold');
+  } else {
+    rejected++;
+    if(c.tag === 'свой'){ dR = 14 + (Math.random()*10 | 0); txt = pick(REJ_TXT.svoi); }
+    else if(c.tag === 'палево'){ dR = -(4 + (Math.random()*4 | 0)); txt = pick(REJ_TXT.palevo); }
+    else if(c.tag === 'крыша'){ dR = 8 + (Math.random()*6 | 0); txt = pick(REJ_TXT.krysha); }
+    else {
+      if(r < 0.7){ dR = -(2 + (Math.random()*4 | 0)); txt = pick(REJ_TXT.obychno_ok); }
+      else { dR = 4 + (Math.random()*4 | 0); txt = pick(REJ_TXT.obychno_bad); }
+    }
+    chips.push({cls:'', txt:'тендер отклонён'});
+    news(maybeName(pick(REJ_NEWS)), 'ОФИЦИАЛЬНО', '');
+  }
+
+  dR -= 1;
+  kick = Math.max(0, kick + dK);
+  risk = Math.max(0, Math.min(100, risk + dR));
+
+  chips.push({cls: dR > 0 ? 'bad' : 'good', txt:`интерес ${dR > 0 ? '+' : ''}${dR}%`});
+  showVerdict(txt, chips);
+  updHud();
+
+  if(dK >= 2) SFX.cash();
+  else if(dR >= 12) SFX.alarm();
+}
+
+/* ═══ ВЗЯТКА ═══ */
+function bribe(){
+  if(busy || ended) return;
+  ensureAudio();
+  if(kick < bribeCost){
+    showVerdict('В кармане не хватает на взятку. Сначала подпишите что-нибудь прибыльное — прокуроры не принимают обещания.',
+      [{cls:'bad', txt:'нужно ' + bribeCost.toFixed(1) + ' млрд'}]);
+    SFX.alarm();
+    return;
+  }
+  busy = true;
+  const paid = bribeCost;
+  kick -= paid;
+  bribeSpent += paid;
+  bribes++;
+
+  const r = Math.random();
+  let dR, txt, ok = false;
+  if(r < 0.10){ dR = -(34 + (Math.random()*10 | 0)); txt = pick(BRIBE_JACK); ok = true; }
+  else if(r < 0.62){ dR = -(12 + (Math.random()*16 | 0)); txt = pick(BRIBE_OK); ok = true; }
+  else { dR = 8 + (Math.random()*12 | 0); txt = pick(BRIBE_BAD); }
+
+  risk = Math.max(0, Math.min(100, risk + dR));
+  bribeCost = Math.min(32, bribeCost*2);
+  updBribeBtn();
+
+  showVerdict(txt, [
+    {cls:'gold', txt:'взятка −' + paid.toFixed(1) + ' млрд'},
+    {cls: dR > 0 ? 'bad' : 'good', txt:'интерес ' + (dR > 0 ? '+' : '') + dR + '%'}
+  ], ok ? 'bribe-ok' : '');
+
+  news(pick(ok ? BRIBE_OK_NEWS : BRIBE_BAD_NEWS), 'ИСТОЧНИКИ', ok ? 'gold' : 'red');
+  updHud();
+  ok ? SFX.bribeOk() : SFX.bribeBad();
+  busy = false;
+  checkEnd();
+  if(!ended){ maybeCall(); maybeKnock(); }
+}
+
+/* ═══ ФИНАЛЫ ═══ */
+function checkEnd(){
+  if(risk >= 100) return endGame('prison');
+  if(spent >= GOAL) return endGame('win');
+  if(moves <= 0) return endGame('burn');
+}
+
+function winScene(){
+  let coins = '';
+  for(let i = 0; i < 7; i++){
+    const left = 6 + Math.random()*88;
+    const dur = 1.4 + Math.random()*1.4;
+    const delay = Math.random()*2;
+    coins += `<i style="left:${left}%;animation-duration:${dur}s;animation-delay:-${delay}s">🪙</i>`;
+  }
+  return `<div class="win-scene">
+    <div class="rain">${coins}</div>
+    <div class="wave"></div>
+    <div class="yacht">🛥️</div>
+    <div class="bars">
+      <div class="row"><i></i><i></i></div>
+      <div class="row"><i></i><i></i><i></i></div>
+    </div>
+  </div>`;
+}
+
+function endGame(type){
+  ended = true;
+  document.body.classList.remove('hot','veryhot');
+  $('#stack').classList.remove('tremble');
+  closeNews();
+  $('#rulesPanel').hidden = true;
+  if(callActive){ callActive = false; clearInterval(callRinger); clearInterval(callTO); $('#callUI').hidden = true; }
+  if(type === 'prison'){
+    news('ВСЕМ ЛЕЖАТЬ! РАБОТАЕТ ОМОН!', 'СРОЧНО', 'red');
+    PRISON_NEWS.forEach(n => news(n, 'СРОЧНО', 'red'));
+    showRaid(() => showEndCard(type));
+  } else {
+    if(type === 'win') WIN_NEWS.forEach(n => news(n, 'ОФИЦИАЛЬНО', 'green'));
+    else BURN_NEWS.forEach(n => news(n, 'ОФИЦИАЛЬНО', ''));
+    showEndCard(type);
+  }
+}
+
+function showRaid(cb){
+  const r = $('#raid');
+  r.hidden = false;
+  SFX.crash();
+  setTimeout(SFX.whistle, 300);
+  setTimeout(() => { r.hidden = true; cb(); }, 1900);
+}
+
+function showEndCard(type){
+  const o = $('#overlay');
+  let emoji, title, txt, cls = '', scene = '';
+  if(type === 'win'){ emoji = '🏆'; title = 'БЮДЖЕТ ОСВОЕН НА 100%'; txt = pick(WIN_TXT); scene = winScene(); SFX.cash(); }
+  else if(type === 'prison'){ emoji = '🚔'; title = 'ВАС ВЗЯЛИ'; txt = pick(PRISON_TXT); cls = 'prison'; SFX.lose(); }
+  else { emoji = '📉'; title = 'КВАРТАЛ КОНЧИЛСЯ'; txt = pick(BURN_TXT); cls = 'prison'; SFX.lose(); }
+
+  o.innerHTML =
+    `<div class="o-card ${cls}">
+      <div class="o-emoji">${emoji}</div>
+      <h2>${title}</h2>
+      ${scene}
+      <p>${txt}</p>
+      <div class="o-stats">
+        <div><label>Освоено</label><b>${spent.toFixed(1)} / 100 млрд</b></div>
+        <div><label>Откат в карман</label><b>${Math.round(kick*1e9).toLocaleString('ru-RU')} ₽</b></div>
+        <div><label>Взяток дано</label><b>${bribes} · на ${bribeSpent.toFixed(1)} млрд</b></div>
+        <div><label>Подписано / отклонено</label><b>${signed} / ${rejected}</b></div>
+      </div>
+      <div><button class="o-btn" onclick="location.reload()">🔄 ОСВОИТЬ ЗАНОВО</button></div>
+    </div>`;
+  o.classList.add('show');
+}
+
+$('#btnSign').onclick = () => act(true);
+$('#btnReject').onclick = () => act(false);
+$('#btnBribe').onclick = bribe;
+document.addEventListener('keydown', e => {
+  if(e.key === 'ArrowRight') act(true);
+  if(e.key === 'ArrowLeft') act(false);
+  if(e.code === 'KeyB') bribe();
+});
+
+setInterval(() => {
+  if(!ended && !callActive && !document.hidden && Math.random() < 0.85)
+    news(maybeName(pick(IDLE_NEWS)), 'РЕПЛИКА', '');
+}, 9000);
+
+renderStack();
+updHud();
+updBribeBtn();
+SEED_NEWS.forEach((s, i) => setTimeout(() => news(s[2], s[0], s[1]), 500 + i*700));
+hbTick();
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+</script>
+
+<script>
+/* ═══ ПАРОЛЬ ═══ */
+(function(){
+  const HASH = '71ba3671eba952c90ab171883d271833bf6a5f8a9fb0b200322574613129d540';
+  const lock = document.getElementById('lock');
+  if(sessionStorage.getItem('gos_ok') === '1'){ lock.style.display = 'none'; return; }
+  async function sha256(text){
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+  async function tryUnlock(){
+    const val = document.getElementById('lockPass').value.trim();
+    if(!val) return;
+    if(await sha256(val) === HASH){
+      sessionStorage.setItem('gos_ok','1');
+      lock.style.display = 'none';
+    } else {
+      const card = document.getElementById('lockCard');
+      document.getElementById('lockErr').textContent = 'Пароль не подошёл. Попытка записана прокуратурой.';
+      document.getElementById('lockPass').value = '';
+      card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
+    }
+  }
+  document.getElementById('lockBtn').onclick = tryUnlock;
+  document.getElementById('lockPass').addEventListener('keydown', e => { if(e.key === 'Enter') tryUnlock(); });
+  document.getElementById('lockPass').focus();
+})();
+</script>
+</body>
+</html>
